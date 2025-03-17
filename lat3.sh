@@ -3,21 +3,24 @@
 trap ctrl_c INT
 
 function ctrl_c(){
-  echo "[!] Proceso detenido..."
+  echo "\n[!] Proceso detenido..\n"
+  exit 1
 }
 
 function helpPanel(){
-  echo -e "[+] Uso: ./late.sh \n\n"
+  echo -e "[+] Uso: ./lat3.sh \n\n"
   echo -e "[*] Parametros:\n"
-  echo -e "\t -l  Lenguaje de salida"
+  echo -e "\t -l  Lenguaje de salida | Ejemplo: -l en -> Lenguajes disponibles trans -R" 
   echo -e "\t -t  Establece el tiempo de escucha en segundos -> -t 10"
   echo -e "\t -f  Traduce un archivo"
   echo -e "\t -m  Modo de Traducción -> Por entrada de voz (listen)"
   echo -e "\t -h  Panel de Ayuda"
+
+  echo -e "\n[*] Ejemplo de ejecución: ./lat3.sh -m listen -l en -t 10"
 }
 
 function listen_mode(){
-  echo -e "\nEscuchando... ($listen_time segs)"
+  echo -e "\n[*] Escuchando... ($listen_time segs)"
   arecord -f cd -d $listen_time input.wav > /dev/null 2>&1
   sleep 1
 
@@ -30,12 +33,12 @@ function listen_mode(){
   echo -e "\nHas dicho:"
   cat output.txt
 
-  traduccion=$(trans -b es:$lenguaje -i output.txt -o history/traduccion_$(date | cut -d " " -f5).txt)
+  traduccion=$(trans -b es:$lenguaje -i output.txt -o ./history/traduccion_$(date | cut -d " " -f5).txt)
   echo -e "\nTexto Traducido:"
   echo $traduccion
 
-  mv audio.wav history/audio_$(date | cut -d " " -f5).wav
-  mv output.txt history/output$(date | cut -d " " -f5).txt
+  mv audio.wav ./history/audio_$(date | cut -d " " -f5).wav
+  mv output.txt ./history/output$(date | cut -d " " -f5).txt
   rm input.wav result.txt > /dev/null 2>&1
 }
 
