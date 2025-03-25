@@ -65,25 +65,67 @@ function listen_mode(){
   rm input.wav result.txt > /dev/null 2>&1
 }
 
+function requirements(){
+  echo -e "\n${yellow}[*]${end}${purple} Instalando aplicaciones necesarias...${end}\n"
+  sleep 1
+
+  test -f /usr/bin/arecord
+  if [ "$(echo $?)" == "0" ]; then
+    echo -e "\tarecord ${green}(V)${end}"
+  else
+    echo -e "\tarecord ${red}(X)${end}"
+    echo -e "\t${yellow}[*] Instalando ${end}${blue}Arecrod...${end}\n"
+    apt-get install alsa-utils -y > /dev/null 2>&1
+  fi;
+  sleep 1
+  test -f /usr/bin/ffmpeg
+  if [ "$(echo $?)" == "0" ]; then
+    echo -e "\tffmpeg ${green}(V)${end}"
+  else
+    echo -e "\tffmpeg ${red}(X)${end}"
+    echo -e "\t${yellow}[*] Instalando ${end}${blue}ffmepg...${end}"
+    apt-get install ffmepg -y > /dev/null 2>&1
+  fi;
+  sleep 1
+  test -f /usr/bin/trans
+  if [ "$(echo $?)" == "0" ]; then
+    echo -e "\ttrans ${green}(V)${end}"
+  else
+    echo -e "\ttrans ${red}(X)${end}"
+    echo -e "\t${yellow}[*] Instalando ${end}${blue}translate-shell...${end}"
+    apt-get install translate-shell -y > /dev/null 2>&1
+  fi;
+  sleep 1
+  echo -e "\n${yellow}[+]${end} ${purple}Instalando dependecia de Python${end} (vosk)"
+  pip install vosk > /dev/null 2>&1
+
+  exit 0
+}
+
+# MAIN
 declare -i parameter_count=0
 
-while getopts ":l:t:f:m:h:" arg; do
+while getopts ":l:t:f:m:rh" arg; do
   case $arg in
     l) lenguaje=$OPTARG; let parameter_count+=1 ;;
     t) listen_time=$OPTARG; let parameter_count+=1 ;;
     f) file_name=$OPTARG; let parameter_count+=1 ;;
     m) mode=$OPTARG; let parameter_count+=1 ;;
+    r) requirements; let parameter_count+=1 ;;
     h) helpPanel ;;
   esac
 done
 
 if [ $parameter_count -eq 0 ]; then
-  helpPanel
+  echo -e "\n${red}[!] Sin parametros introduciodos${end}"
+  echo -e "\n${turq}[+] Panel de ayuda:${end} ./lat3.sh -h"
+  exit 1
 else
   if [ $mode = "listen" ]; then
     listen_mode
   else
-    echo "${red}[!] El modo indicado no existe${end}"
+    echo -e "${red}[!] El modo indicado no existe${end}"
     helpPanel
+    exit 1
   fi
 fi
